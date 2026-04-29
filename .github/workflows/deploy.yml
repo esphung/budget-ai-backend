@@ -1,11 +1,9 @@
 name: Deploy
 
 on:
-  pull_request_target:
+  push:
     branches:
       - main
-    types:
-      - closed
 
 jobs:
   deploy:
@@ -15,5 +13,5 @@ jobs:
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "gomuuv-development-server"
+          heroku_app_name: "budget-ai-backend"
           heroku_email: "esphung@gmail.com"
