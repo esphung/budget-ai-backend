@@ -3,10 +3,11 @@
 	"version": "0.1.0",
 	"description": "Local Node.js backend for BudgetAI POC",
 	"private": true,
+	"main": "dist/index.js",
 	"scripts": {
 		"dev": "npx ts-node-dev --respawn --exit-child --transpile-only src/index.ts",
 		"build": "npx tsc",
-		"start": "npx ts-node src/index.ts",
+		"start": "npx tsc && node dist/index.js",
 		"test": "npx jest",
 		"test:coverage": "npx jest --coverage"
 	},
