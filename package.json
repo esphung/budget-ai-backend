@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "npx ts-node-dev --respawn --exit-child --transpile-only src/index.ts",
 		"build": "npx tsc",
-		"start": "npx nodemon src/index.ts",
+		"start": "npx ts-node src/index.ts",
 		"test": "npx jest",
 		"test:coverage": "npx jest --coverage"
 	},
