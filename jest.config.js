@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { createDefaultPreset } = require('ts-jest');
 
 const tsJestTransformCfg = createDefaultPreset().transform;
@@ -20,9 +21,15 @@ module.exports = {
     'src/routes/index.ts',
   ],
   coverageReporters: ['text', 'lcov'],
-  globals: {
-    'ts-jest': {
+  // globals: {
+  //   'ts-jest': {
+  //     tsconfig: 'tsconfig.json',
+  //   },
+  // },
+
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: 'tsconfig.json',
-    },
+    }],
   },
 };

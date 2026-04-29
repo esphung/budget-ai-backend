@@ -71,7 +71,7 @@ describe('Public Router', () => {
 		it('should include request and response examples where applicable', async () => {
 			const response = await request(app).get('/');
 			const postEndpoints = response.body.endpoints.filter(
-				(e: { method: string }) => e.method === 'POST',
+				(e: { method: string }) => e.method === 'POST'
 			);
 
 			postEndpoints.forEach((endpoint: Record<string, unknown>) => {
@@ -98,7 +98,7 @@ describe('Public Router', () => {
 			expect(response.status).toBe(200);
 			expect(response.body).toHaveProperty(
 				'openApiSpec',
-				'/openapi.json',
+				'/openapi.json'
 			);
 			expect(response.body).toHaveProperty('docs', '/docs');
 		});
@@ -111,13 +111,10 @@ describe('Public Router', () => {
 			expect(response.status).toBe(200);
 			expect(response.type).toMatch(/json/);
 			expect(response.body).toHaveProperty('openapi', '3.0.3');
-			expect(response.body).toHaveProperty(
-				'info.title',
-				'BudgetAI API',
-			);
+			expect(response.body).toHaveProperty('info.title', 'BudgetAI API');
 			expect(response.body).toHaveProperty('paths./health.get');
 			expect(response.body).toHaveProperty(
-				'paths./openai/send-message.post',
+				'paths./openai/send-message.post'
 			);
 		});
 	});

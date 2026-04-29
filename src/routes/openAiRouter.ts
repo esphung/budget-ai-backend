@@ -19,7 +19,7 @@ function isValidMessageArray(value: unknown): value is Message[] {
 			typeof item === 'object' &&
 			item !== null &&
 			typeof item.role === 'string' &&
-			typeof item.content === 'string',
+			typeof item.content === 'string'
 	);
 }
 
@@ -43,21 +43,32 @@ router.post(
 				status: 500,
 			});
 		}
-	},
+	}
 );
 
 function validateMessages(
 	req: Request,
 	res: Response,
-	next: express.NextFunction,
+	next: express.NextFunction
 ) {
 	const { messages } = req.body as { messages?: unknown };
 
-	if (!isValidMessageArray(messages)) {
+	try {
+		if (!isValidMessageArray(messages)) {
+			res.status(400).json({
+				errorMessage: 'Invalid request body',
+				errorDetails:
+					'Expected body shape: { "messages": [{ "role": string, "content": string }] }',
+				data: null,
+				status: 400,
+			});
+			return;
+		}
+	} catch (error) {
 		res.status(400).json({
 			errorMessage: 'Invalid request body',
 			errorDetails:
-				'Expected body shape: { "messages": [{ "role": string, "content": string }] }',
+				error instanceof Error ? error.message : String(error),
 			data: null,
 			status: 400,
 		});

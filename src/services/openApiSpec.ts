@@ -5,9 +5,7 @@ export const openApiSpec = {
 		version: '1.0.0',
 		description: 'Public API for BudgetAI backend services.',
 	},
-	servers: [
-		{ url: 'http://localhost:3001', description: 'Local server' },
-	],
+	servers: [{ url: 'http://localhost:3001', description: 'Local server' }],
 	paths: {
 		'/health': {
 			get: {

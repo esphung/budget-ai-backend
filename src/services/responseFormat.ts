@@ -1,6 +1,4 @@
-import type OpenAI from 'openai';
-
-export const responseFormat: OpenAI.ResponseFormatJSONSchema = {
+export const responseFormat = {
 	type: 'json_schema',
 	json_schema: {
 		name: 'budget_ai_response',
