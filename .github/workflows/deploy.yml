@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - main
-    types:
-      - closed
-  push:
-    branches:
-      - esphung/test/automatic-deploy
 
 jobs:
   deploy:
