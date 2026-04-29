@@ -1,7 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { env } from './env';
 import { responseFormat } from './responseFormat';
-import type { OpenAI } from 'openai';
 import type { Action, OpenAIAssistantResponse } from '../types/openai';
 
 function isAction(value: unknown): value is Action {
@@ -23,9 +22,9 @@ function isAction(value: unknown): value is Action {
 	);
 }
 
-function toAssistantResponse(
-	completion: OpenAI.ChatCompletion,
-): OpenAIAssistantResponse {
+function toAssistantResponse(completion: {
+	choices?: { message?: { content?: unknown } }[];
+}): OpenAIAssistantResponse {
 	const rawContent = completion.choices?.[0]?.message?.content;
 	const fallbackMessage =
 		typeof rawContent === 'string' && rawContent.length > 0
@@ -80,10 +79,12 @@ class OpenAiService {
 	}
 
 	async sendAIMessage(
-		messages: { role: string; content: string }[],
+		messages: { role: string; content: string }[]
 	): Promise<OpenAIAssistantResponse> {
 		try {
-			const response = await axios<OpenAI.ChatCompletion>({
+			const response = await axios<{
+				choices?: { message?: { content?: unknown } }[];
+			}>({
 				...this.config,
 				method: 'POST',
 				url: '/chat/completions',
@@ -119,7 +120,7 @@ Rules:
 		} catch (error: any) {
 			console.error(
 				'Error sending AI message:',
-				error.response?.data ?? error.message,
+				error.response?.data ?? error.message
 			);
 			throw error;
 		}
@@ -128,5 +129,5 @@ Rules:
 
 export const openAiService = OpenAiService.getInstance(
 	env.openAi.apiKey,
-	env.openAi.baseUrl,
+	env.openAi.baseUrl
 );

@@ -20,9 +20,15 @@ module.exports = {
     'src/routes/index.ts',
   ],
   coverageReporters: ['text', 'lcov'],
-  globals: {
-    'ts-jest': {
+  // globals: {
+  //   'ts-jest': {
+  //     tsconfig: 'tsconfig.json',
+  //   },
+  // },
+
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: 'tsconfig.json',
-    },
+    }],
   },
 };

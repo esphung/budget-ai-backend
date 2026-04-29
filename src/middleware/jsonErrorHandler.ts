@@ -1,11 +1,6 @@
 import { ErrorRequestHandler } from 'express';
 
-export const jsonErrorHandler: ErrorRequestHandler = (
-	err,
-	_req,
-	res,
-	next,
-) => {
+export const jsonErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
 	if (
 		err instanceof SyntaxError &&
 		'body' in err &&

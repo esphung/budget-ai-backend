@@ -80,9 +80,7 @@ function buildServerUrl(req: Request): string {
 router.get('/openapi.json', (req: Request, res: Response) => {
 	res.json({
 		...openApiSpec,
-		servers: [
-			{ url: buildServerUrl(req), description: 'Current server' },
-		],
+		servers: [{ url: buildServerUrl(req), description: 'Current server' }],
 	});
 });
 
