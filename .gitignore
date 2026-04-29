@@ -32,3 +32,9 @@ node_modules/
 # Ignore log files
 logs/
 *.log
+
+src/.DS_Store
+
+.DS_Store
+
+coverage/
