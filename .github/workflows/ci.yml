@@ -33,5 +33,9 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Build bindings
+        run: npm rebuild sqlite3 --verbose
+        shell: bash
+
       - name: Run unit tests
         run: yarn test --maxWorkers=2 --coverage
