@@ -12,6 +12,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"moduleResolution": "nodenext",
 		"types": ["jest", "node"],
+		"noImplicitAny": false
 	},
 	"include": ["src", "index.ts"],
 	"exclude": ["node_modules", "dist", "coverage"]
