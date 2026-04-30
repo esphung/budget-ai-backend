@@ -17,7 +17,7 @@
 		"lint": "npx eslint src/**/*.ts",
 		"lint:fix": "npx eslint src/**/*.ts --fix",
 		"typecheck": "npx tsc --noEmit --project tsconfig.json",
-		"postinstall": "npx tsc --project tsconfig.json",
+		"postinstall": "npx tsc --project tsconfig.json && npm rebuild sqlite3 --verbose",
 		"format": "npx prettier --write 'src/**/*.ts'",
 		"format:check": "npx prettier --check 'src/**/*.ts'",
 		"precommit": "yarn lint:fix && yarn typecheck && yarn test"
