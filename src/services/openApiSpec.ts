@@ -142,5 +142,151 @@ export const openApiSpec = {
 				},
 			},
 		},
+		'/transactions': {
+			get: {
+				tags: ['Transactions'],
+				summary: 'Get all transactions',
+				responses: {
+					'200': {
+						description: 'List of transactions',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string' },
+											account_id: { type: 'string' },
+											amount: { type: 'number' },
+											date: { type: 'string' },
+											merchant: { type: 'string' },
+											category: { type: 'string' },
+											transaction_type: {
+												type: 'string',
+											},
+											created_at: { type: 'string' },
+											source: { type: 'string' },
+										},
+										required: [
+											'id',
+											'amount',
+											'date',
+											'created_at',
+										],
+									},
+								},
+							},
+						},
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+			post: {
+				tags: ['Transactions'],
+				summary: 'Create a new transaction',
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									account_id: { type: 'string' },
+									amount: { type: 'number' },
+									date: { type: 'string' },
+									merchant: { type: 'string' },
+									category: { type: 'string' },
+									transaction_type: { type: 'string' },
+									created_at: { type: 'string' },
+									source: { type: 'string' },
+								},
+								required: ['amount', 'date', 'created_at'],
+							},
+						},
+					},
+				},
+				responses: {
+					'201': {
+						description: 'Transaction created successfully',
+					},
+					'400': {
+						description: 'Invalid request body',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
+		'/transactions/{id}': {
+			put: {
+				tags: ['Transactions'],
+				summary: 'Update a transaction',
+				parameters: [
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string' },
+						description: 'Transaction ID',
+					},
+				],
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									amount: { type: 'number' },
+									merchant: { type: 'string' },
+								},
+							},
+						},
+					},
+				},
+				responses: {
+					'200': {
+						description: 'Transaction updated successfully',
+					},
+					'400': {
+						description: 'Invalid request body',
+					},
+					'404': {
+						description: 'Transaction not found',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+			delete: {
+				tags: ['Transactions'],
+				summary: 'Delete a transaction',
+				parameters: [
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string' },
+						description: 'Transaction ID',
+					},
+				],
+				responses: {
+					'200': {
+						description: 'Transaction deleted successfully',
+					},
+					'404': {
+						description: 'Transaction not found',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
 	},
 } as const;
