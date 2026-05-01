@@ -8,6 +8,8 @@ import { initDb } from './services/databaseService';
 import { Database } from 'sqlite3';
 import { createTransactionsRouter } from './routes/transactionsRouter';
 import { createAccountsRouter } from './routes/accountsRouter';
+import { createCategoriesRouter } from './routes/categoriesRouter';
+import { createBudgetsRouter } from './routes/budgetsRouter';
 
 async function startDb(): Promise<Database> {
 	try {
@@ -24,8 +26,10 @@ function generateRouters(db: Database): Record<string, Router> {
 	// create routers with db dependency
 	const transactions = createTransactionsRouter(db);
 	const accounts = createAccountsRouter(db);
+	const categories = createCategoriesRouter(db);
+	const budgets = createBudgetsRouter(db);
 
-	return { transactions, accounts };
+	return { transactions, accounts, categories, budgets };
 }
 
 function startServer(routers: Record<string, Router>): express.Application {
@@ -54,6 +58,8 @@ function startServer(routers: Record<string, Router>): express.Application {
 	app.use('/openai', openAiRouter);
 	app.use('/transactions', routers.transactions);
 	app.use('/accounts', routers.accounts);
+	app.use('/categories', routers.categories);
+	app.use('/budgets', routers.budgets);
 
 	app.listen(Number(PORT), () => {
 		logUtils.logger.info(

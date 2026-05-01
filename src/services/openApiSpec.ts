@@ -535,5 +535,338 @@ export const openApiSpec = {
 				},
 			},
 		},
+		'/categories': {
+			get: {
+				tags: ['Categories'],
+				summary: 'Get all categories',
+				responses: {
+					'200': {
+						description: 'List of categories',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string' },
+											name: { type: 'string' },
+											color: {
+												type: 'string',
+												nullable: true,
+											},
+											icon: {
+												type: 'string',
+												nullable: true,
+											},
+											createdAt: { type: 'string' },
+											updatedAt: { type: 'string' },
+										},
+										required: [
+											'id',
+											'name',
+											'createdAt',
+											'updatedAt',
+										],
+									},
+								},
+							},
+						},
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+			post: {
+				tags: ['Categories'],
+				summary: 'Create a new category',
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									name: { type: 'string' },
+									color: { type: 'string' },
+									icon: { type: 'string' },
+								},
+								required: ['name'],
+							},
+						},
+					},
+				},
+				responses: {
+					'201': {
+						description: 'Category created successfully',
+					},
+					'400': {
+						description: 'Invalid request body',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
+		'/categories/{id}': {
+			put: {
+				tags: ['Categories'],
+				summary: 'Update a category',
+				parameters: [
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string' },
+						description: 'Category ID',
+					},
+				],
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									name: { type: 'string' },
+									color: { type: 'string' },
+									icon: { type: 'string' },
+									updatedAt: { type: 'string' },
+								},
+							},
+						},
+					},
+				},
+				responses: {
+					'200': {
+						description: 'Category updated successfully',
+					},
+					'400': {
+						description: 'Invalid request body',
+					},
+					'404': {
+						description: 'Category not found',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+			delete: {
+				tags: ['Categories'],
+				summary: 'Delete a category',
+				parameters: [
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string' },
+						description: 'Category ID',
+					},
+				],
+				responses: {
+					'200': {
+						description: 'Category deleted successfully',
+					},
+					'404': {
+						description: 'Category not found',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
+		'/categories/all': {
+			delete: {
+				tags: ['Categories'],
+				summary: 'Delete all categories',
+				responses: {
+					'200': {
+						description: 'All categories cleared successfully',
+					},
+					'400': {
+						description: 'Failed to clear categories',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
+		'/budgets': {
+			get: {
+				tags: ['Budgets'],
+				summary: 'Get all budgets',
+				responses: {
+					'200': {
+						description: 'List of budgets',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string' },
+											name: { type: 'string' },
+											amount: { type: 'number' },
+											categoryId: {
+												type: 'string',
+												nullable: true,
+											},
+											periodStart: { type: 'string' },
+											periodEnd: { type: 'string' },
+											createdAt: { type: 'string' },
+											updatedAt: { type: 'string' },
+										},
+										required: [
+											'id',
+											'name',
+											'amount',
+											'periodStart',
+											'periodEnd',
+											'createdAt',
+											'updatedAt',
+										],
+									},
+								},
+							},
+						},
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+			post: {
+				tags: ['Budgets'],
+				summary: 'Create a new budget',
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									name: { type: 'string' },
+									amount: { type: 'number' },
+									categoryId: { type: 'string' },
+									periodStart: { type: 'string' },
+									periodEnd: { type: 'string' },
+								},
+								required: [
+									'name',
+									'amount',
+									'periodStart',
+									'periodEnd',
+								],
+							},
+						},
+					},
+				},
+				responses: {
+					'201': {
+						description: 'Budget created successfully',
+					},
+					'400': {
+						description: 'Invalid request body',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
+		'/budgets/{id}': {
+			put: {
+				tags: ['Budgets'],
+				summary: 'Update a budget',
+				parameters: [
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string' },
+						description: 'Budget ID',
+					},
+				],
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									name: { type: 'string' },
+									amount: { type: 'number' },
+									categoryId: { type: 'string' },
+									periodStart: { type: 'string' },
+									periodEnd: { type: 'string' },
+									updatedAt: { type: 'string' },
+								},
+							},
+						},
+					},
+				},
+				responses: {
+					'200': {
+						description: 'Budget updated successfully',
+					},
+					'400': {
+						description: 'Invalid request body',
+					},
+					'404': {
+						description: 'Budget not found',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+			delete: {
+				tags: ['Budgets'],
+				summary: 'Delete a budget',
+				parameters: [
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string' },
+						description: 'Budget ID',
+					},
+				],
+				responses: {
+					'200': {
+						description: 'Budget deleted successfully',
+					},
+					'404': {
+						description: 'Budget not found',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
+		'/budgets/all': {
+			delete: {
+				tags: ['Budgets'],
+				summary: 'Delete all budgets',
+				responses: {
+					'200': {
+						description: 'All budgets cleared successfully',
+					},
+					'400': {
+						description: 'Failed to clear budgets',
+					},
+					'500': {
+						description: 'Internal server error',
+					},
+				},
+			},
+		},
 	},
 } as const;

@@ -1,6 +1,6 @@
 # BudgetAI Backend
 
-A local Node.js/Express REST API that powers the BudgetAI personal finance assistant. It provides CRUD endpoints for accounts and transactions, an OpenAI-backed chat assistant that can parse natural-language expense entries and trigger app actions, and Plaid integration for bank account linking.
+A local Node.js/Express REST API that powers the BudgetAI personal finance assistant. It provides CRUD endpoints for accounts, transactions, categories, and budgets; an OpenAI-backed chat assistant that can parse natural-language expense entries and trigger app actions; and Plaid integration for bank account linking.
 
 ---
 
@@ -17,6 +17,8 @@ A local Node.js/Express REST API that powers the BudgetAI personal finance assis
   + [System](#system)
   + [Accounts](#accounts)
   + [Transactions](#transactions)
+  + [Categories](#categories)
+  + [Budgets](#budgets)
   + [OpenAI](#openai)
   + [Plaid](#plaid)
 * [Database](#database)
@@ -49,13 +51,19 @@ src/
 │   ├── AbstractController.ts
 │   ├── DatabaseController.ts
 │   ├── AccountsController.ts
-│   └── TransactionsController.ts
+│   ├── TransactionsController.ts
+│   ├── CategoriesController.ts
+│   └── BudgetsController.ts
 ├── repositories/
 │   ├── AccountRepository.ts
-│   └── TransactionRepository.ts
+│   ├── TransactionRepository.ts
+│   ├── CategoryRepository.ts
+│   └── BudgetRepository.ts
 ├── routes/
 │   ├── accountsRouter.ts
 │   ├── transactionsRouter.ts
+│   ├── categoriesRouter.ts
+│   ├── budgetsRouter.ts
 │   ├── openAiRouter.ts
 │   ├── plaidRouter.ts
 │   └── publicRouter.ts       # Serves /, /openapi.json, /docs
@@ -68,6 +76,8 @@ src/
 ├── types/
 │   ├── Account.ts
 │   ├── Transaction.ts
+│   ├── Category.ts
+│   ├── Budget.ts
 │   ├── BaseRepository.ts
 │   └── openai.ts
 ├── usecases/
@@ -80,7 +90,9 @@ src/
 
 scripts/
 ├── accounts/                 # curl helpers for the Accounts API
-└── transactions/             # curl helpers for the Transactions API
+├── transactions/             # curl helpers for the Transactions API
+├── categories/               # curl helpers for the Categories API
+└── budgets/                  # curl helpers for the Budgets API
 ```
 
 ---
@@ -235,6 +247,84 @@ The raw OpenAPI 3.0 spec is served at **http://localhost:3001/openapi.json**.
 
 ---
 
+### Categories
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/categories` | List all categories |
+| `POST` | `/categories` | Create a category |
+| `PUT` | `/categories/:id` | Update a category |
+| `DELETE` | `/categories/:id` | Delete a category |
+| `DELETE` | `/categories/all` | Delete all categories |
+
+**Category object**
+
+```json
+{
+  "id": "cat_abc123",
+  "name": "Groceries",
+  "color": "#00aa00",
+  "icon": "🛒",
+  "createdAt": "2026-04-30T00:00:00.000Z",
+  "updatedAt": "2026-04-30T00:00:00.000Z"
+}
+```
+
+`color` and `icon` are optional and nullable.
+
+**Create / update request body**
+
+```json
+{
+  "name": "Groceries",
+  "color": "#00aa00",
+  "icon": "🛒"
+}
+```
+
+---
+
+### Budgets
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/budgets` | List all budgets |
+| `POST` | `/budgets` | Create a budget |
+| `PUT` | `/budgets/:id` | Update a budget |
+| `DELETE` | `/budgets/:id` | Delete a budget |
+| `DELETE` | `/budgets/all` | Delete all budgets |
+
+**Budget object**
+
+```json
+{
+  "id": "bgt_abc123",
+  "name": "Monthly Groceries",
+  "amount": 500,
+  "categoryId": "cat_abc123",
+  "periodStart": "2026-04-01",
+  "periodEnd": "2026-04-30",
+  "createdAt": "2026-04-30T00:00:00.000Z",
+  "updatedAt": "2026-04-30T00:00:00.000Z"
+}
+```
+
+`categoryId` is optional and nullable (FK → `categories.id` , set to `NULL` on category deletion).
+
+**Create / update request body**
+
+```json
+{
+  "name": "Monthly Groceries",
+  "amount": 500,
+  "periodStart": "2026-04-01",
+  "periodEnd": "2026-04-30",
+  "categoryId": "cat_abc123"
+}
+```
+
+---
+
 ### OpenAI
 
 | Method | Path | Description |
@@ -334,18 +424,32 @@ Convenience `curl` scripts for manual API testing are provided under `scripts/` 
 scripts/
 ├── accounts/
 │   ├── get_all_accounts.sh
-│   ├── create_account.sh       <name> <accountType> [currency]
-│   ├── update_account.sh       <id> <name> <accountType> [currency]
-│   ├── delete_account.sh       <id>
+│   ├── create_account.sh           <name> <accountType> [currency]
+│   ├── update_account.sh           <id> <name> <accountType> [currency]
+│   ├── delete_account.sh           <id>
 │   ├── clear_accounts.sh
-│   └── smoke_test_accounts.sh  [accountType] [currency]
-└── transactions/
-    ├── list_transactions.sh
-    ├── create_transaction.sh
-    ├── update_transaction.sh
-    ├── delete_transaction.sh
-    ├── clear_transactions.sh
-    └── smoke_test_transactions.sh  [amount] [updatedAmount]
+│   └── smoke_test_accounts.sh      [accountType] [currency]
+├── transactions/
+│   ├── list_transactions.sh
+│   ├── create_transaction.sh
+│   ├── update_transaction.sh
+│   ├── delete_transaction.sh
+│   ├── clear_transactions.sh
+│   └── smoke_test_transactions.sh  [amount] [updatedAmount]
+├── categories/
+│   ├── get_all_categories.sh
+│   ├── create_category.sh          <name> [color] [icon]
+│   ├── update_category.sh          <id> <name> [color] [icon]
+│   ├── delete_category.sh          <id>
+│   ├── clear_categories.sh
+│   └── smoke_test_categories.sh    [name] [color] [icon]
+└── budgets/
+    ├── get_all_budgets.sh
+    ├── create_budget.sh            <name> <amount> <periodStart> <periodEnd> [categoryId]
+    ├── update_budget.sh            <id> <name> <amount> <periodStart> <periodEnd> [categoryId]
+    ├── delete_budget.sh            <id>
+    ├── clear_budgets.sh
+    └── smoke_test_budgets.sh       [name] [amount] [updatedAmount]
 ```
 
 All scripts default to `BASE_URL=http://localhost:3001` . Override with:
@@ -359,6 +463,8 @@ Run full end-to-end CRUD smoke tests:
 ```bash
 scripts/accounts/smoke_test_accounts.sh
 scripts/transactions/smoke_test_transactions.sh
+scripts/categories/smoke_test_categories.sh
+scripts/budgets/smoke_test_budgets.sh
 ```
 
 ---
