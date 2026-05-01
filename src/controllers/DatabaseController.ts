@@ -1,23 +1,7 @@
 import { Database } from 'sqlite3';
+import { AbstractController } from './AbstractController';
 
-export abstract class BaseController {
-	protected db: Database;
-	constructor(db: Database) {
-		this.db = db;
-	}
-
-	abstract create(table: string, data: Record<string, any>): void;
-	// infer return type from read method in DatabaseController
-	abstract read(table: string, conditions?: Record<string, any>): any[];
-	abstract update(
-		table: string,
-		data: Record<string, any>,
-		conditions: Record<string, any>
-	): void;
-	abstract delete(table: string, conditions: Record<string, any>): void;
-}
-
-export class DatabaseController extends BaseController {
+export class DatabaseController extends AbstractController {
 	constructor(db: Database) {
 		super(db);
 	}
@@ -76,5 +60,10 @@ export class DatabaseController extends BaseController {
 			`DELETE FROM ${table} WHERE ${whereClauses}`
 		);
 		stmt.run(values);
+	}
+
+	clear(table: string) {
+		const stmt = this.db.prepare(`DELETE FROM ${table}`);
+		stmt.run();
 	}
 }

@@ -80,7 +80,6 @@ export class runMigrations {
       ),
       date TEXT NOT NULL,
       created_at TEXT NOT NULL,
-      sync_status TEXT,
       source TEXT,
       FOREIGN KEY (account_id) REFERENCES accounts(id)
         ON DELETE SET NULL

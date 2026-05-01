@@ -24,6 +24,9 @@ jobs:
       - name: Typecheck files
         run: yarn typecheck
 
+      - name: Format check
+        run: yarn format:check
+
   test:
     runs-on: ubuntu-latest
     steps:
