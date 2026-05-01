@@ -6,7 +6,7 @@ import { env } from './services/env';
 import { logUtils } from './services/logUtils';
 import { initDb } from './services/databaseService';
 import { Database } from 'sqlite3';
-import { createTransactionsRouter } from './routes/TransactionsRouter';
+import { createTransactionsRouter } from './routes/transactionsRouter';
 
 async function startDb(): Promise<Database> {
 	try {
