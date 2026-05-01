@@ -25,6 +25,7 @@ export class runMigrations {
         )
       ),
       currency TEXT NOT NULL DEFAULT 'USD',
+      owner_id TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -90,6 +91,7 @@ export class runMigrations {
       date TEXT NOT NULL,
       created_at TEXT NOT NULL,
       source TEXT,
+      owner_id TEXT,
       FOREIGN KEY (account_id) REFERENCES accounts(id)
         ON DELETE SET NULL
     );
@@ -99,6 +101,7 @@ export class runMigrations {
       name TEXT NOT NULL UNIQUE,
       color TEXT,
       icon TEXT,
+      owner_id TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -112,6 +115,7 @@ export class runMigrations {
       period_end TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
+      owner_id TEXT,
       FOREIGN KEY (category_id) REFERENCES categories(id)
         ON DELETE SET NULL
     );

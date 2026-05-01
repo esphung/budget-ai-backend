@@ -11,6 +11,7 @@ const mapRowToBudget = (row: RowBudget): Budget => {
 		categoryId: row.category_id,
 		periodStart: row.period_start,
 		periodEnd: row.period_end,
+		ownerId: row.owner_id,
 		createdAt: row.created_at,
 		updatedAt: row.updated_at,
 	};
@@ -67,7 +68,7 @@ export class BudgetsRepository implements BaseRepository<Budget> {
 			const now = new Date().toISOString();
 
 			this.db.run(
-				'INSERT INTO budgets (id, name, amount, category_id, period_start, period_end, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+				'INSERT INTO budgets (id, name, amount, category_id, period_start, period_end, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
 				[
 					id,
 					item.name,
@@ -75,6 +76,7 @@ export class BudgetsRepository implements BaseRepository<Budget> {
 					item.categoryId ?? null,
 					item.periodStart,
 					item.periodEnd,
+					item.ownerId ?? null,
 					item.createdAt || now,
 					item.updatedAt || now,
 				],
@@ -90,6 +92,7 @@ export class BudgetsRepository implements BaseRepository<Budget> {
 								category_id: item.categoryId ?? null,
 								period_start: item.periodStart || '',
 								period_end: item.periodEnd || '',
+								owner_id: item.ownerId ?? null,
 								created_at: item.createdAt || now,
 								updated_at: item.updatedAt || now,
 							} satisfies RowBudget)
@@ -113,13 +116,14 @@ export class BudgetsRepository implements BaseRepository<Budget> {
 					const merged: Budget = { ...existing, ...item, id };
 
 					this.db.run(
-						'UPDATE budgets SET name = ?, amount = ?, category_id = ?, period_start = ?, period_end = ?, created_at = ?, updated_at = ? WHERE id = ?',
+						'UPDATE budgets SET name = ?, amount = ?, category_id = ?, period_start = ?, period_end = ?, owner_id = ?, created_at = ?, updated_at = ? WHERE id = ?',
 						[
 							merged.name,
 							merged.amount,
 							merged.categoryId,
 							merged.periodStart,
 							merged.periodEnd,
+							merged.ownerId,
 							merged.createdAt,
 							merged.updatedAt,
 							id,

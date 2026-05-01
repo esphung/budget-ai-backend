@@ -14,6 +14,7 @@ const mapRowToTransaction = (row: RowTransaction): Transaction => {
 		category: row.category,
 		transactionType: row.transaction_type as Transaction['transactionType'],
 		source: row.source as Transaction['source'],
+		ownerId: row.owner_id,
 		createdAt: row.created_at,
 	};
 };
@@ -91,7 +92,7 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 		let createdTransaction: Transaction;
 		return new Promise((resolve, reject) => {
 			this.db.run(
-				'INSERT INTO transactions (id, account_id, amount, merchant, category, transaction_type, date, created_at, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+				'INSERT INTO transactions (id, account_id, amount, merchant, category, transaction_type, date, created_at, source, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
 				[
 					item.id || generateUniqueId('txn'),
 					item.accountId,
@@ -102,6 +103,7 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 					item.date || new Date().toISOString(),
 					item.createdAt || new Date().toISOString(),
 					item.source || 'manual',
+					item.ownerId ?? null,
 				],
 				function (this: any, err) {
 					if (err) {
@@ -116,6 +118,7 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 							category: item.category || null,
 							transaction_type: item.transactionType || 'expense',
 							source: item.source || 'manual',
+							owner_id: item.ownerId ?? null,
 							created_at:
 								item.createdAt || new Date().toISOString(),
 						} satisfies RowTransaction);
@@ -159,7 +162,7 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 					};
 
 					this.db.run(
-						'UPDATE transactions SET account_id = ?, amount = ?, date = ?, merchant = ?, category = ?, transaction_type = ?, source = ?, created_at = ? WHERE id = ?',
+						'UPDATE transactions SET account_id = ?, amount = ?, date = ?, merchant = ?, category = ?, transaction_type = ?, source = ?, owner_id = ?, created_at = ? WHERE id = ?',
 						[
 							mergedTransaction.accountId,
 							mergedTransaction.amount,
@@ -168,6 +171,7 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 							mergedTransaction.category,
 							mergedTransaction.transactionType,
 							mergedTransaction.source,
+							mergedTransaction.ownerId,
 							mergedTransaction.createdAt,
 							id,
 						],

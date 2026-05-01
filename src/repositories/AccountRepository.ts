@@ -9,6 +9,7 @@ const mapRowToAccount = (row: RowAccount): Account => {
 		name: row.name,
 		accountType: row.account_type as Account['accountType'],
 		currency: row.currency,
+		ownerId: row.owner_id,
 		createdAt: row.created_at,
 		updatedAt: row.updated_at,
 	};
@@ -70,12 +71,13 @@ export class AccountsRepository implements BaseRepository<Account> {
 			const now = new Date().toISOString();
 
 			this.db.run(
-				'INSERT INTO accounts (id, name, account_type, currency, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+				'INSERT INTO accounts (id, name, account_type, currency, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
 				[
 					id,
 					item.name,
 					item.accountType || 'other',
 					item.currency || 'USD',
+					item.ownerId ?? null,
 					item.createdAt || now,
 					item.updatedAt || now,
 				],
@@ -88,6 +90,7 @@ export class AccountsRepository implements BaseRepository<Account> {
 							name: item.name || '',
 							account_type: item.accountType || 'other',
 							currency: item.currency || 'USD',
+							owner_id: item.ownerId ?? null,
 							created_at: item.createdAt || now,
 							updated_at: item.updatedAt || now,
 						} satisfies RowAccount);
@@ -128,11 +131,12 @@ export class AccountsRepository implements BaseRepository<Account> {
 					};
 
 					this.db.run(
-						'UPDATE accounts SET name = ?, account_type = ?, currency = ?, created_at = ?, updated_at = ? WHERE id = ?',
+						'UPDATE accounts SET name = ?, account_type = ?, currency = ?, owner_id = ?, created_at = ?, updated_at = ? WHERE id = ?',
 						[
 							mergedAccount.name,
 							mergedAccount.accountType,
 							mergedAccount.currency,
+							mergedAccount.ownerId,
 							mergedAccount.createdAt,
 							mergedAccount.updatedAt,
 							id,

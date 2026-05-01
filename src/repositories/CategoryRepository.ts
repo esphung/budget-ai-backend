@@ -9,6 +9,7 @@ const mapRowToCategory = (row: RowCategory): Category => {
 		name: row.name,
 		color: row.color,
 		icon: row.icon,
+		ownerId: row.owner_id,
 		createdAt: row.created_at,
 		updatedAt: row.updated_at,
 	};
@@ -68,12 +69,13 @@ export class CategoriesRepository implements BaseRepository<Category> {
 			const now = new Date().toISOString();
 
 			this.db.run(
-				'INSERT INTO categories (id, name, color, icon, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+				'INSERT INTO categories (id, name, color, icon, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
 				[
 					id,
 					item.name,
 					item.color ?? null,
 					item.icon ?? null,
+					item.ownerId ?? null,
 					item.createdAt || now,
 					item.updatedAt || now,
 				],
@@ -87,6 +89,7 @@ export class CategoriesRepository implements BaseRepository<Category> {
 								name: item.name || '',
 								color: item.color ?? null,
 								icon: item.icon ?? null,
+								owner_id: item.ownerId ?? null,
 								created_at: item.createdAt || now,
 								updated_at: item.updatedAt || now,
 							} satisfies RowCategory)
@@ -110,11 +113,12 @@ export class CategoriesRepository implements BaseRepository<Category> {
 					const merged: Category = { ...existing, ...item, id };
 
 					this.db.run(
-						'UPDATE categories SET name = ?, color = ?, icon = ?, created_at = ?, updated_at = ? WHERE id = ?',
+						'UPDATE categories SET name = ?, color = ?, icon = ?, owner_id = ?, created_at = ?, updated_at = ? WHERE id = ?',
 						[
 							merged.name,
 							merged.color,
 							merged.icon,
+							merged.ownerId,
 							merged.createdAt,
 							merged.updatedAt,
 							id,

@@ -3,6 +3,7 @@ export type Category = {
 	name: string;
 	color: string | null;
 	icon: string | null;
+	ownerId: string | null;
 	createdAt: string;
 	updatedAt: string;
 };
@@ -12,6 +13,7 @@ export type RowCategory = {
 	name: string;
 	color: string | null;
 	icon: string | null;
+	owner_id: string | null;
 	created_at: string;
 	updated_at: string;
 };
