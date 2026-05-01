@@ -11,6 +11,7 @@ export type Transaction = {
 	source: 'ai' | 'manual';
 	rawUserText?: string;
 	syncStatus?: 'pending' | 'synced';
+	ownerId: string | null;
 	createdAt: string;
 };
 
@@ -23,5 +24,6 @@ export type RowTransaction = {
 	category: string | null;
 	transaction_type: string;
 	source: string;
+	owner_id: string | null;
 	created_at: string;
 };
