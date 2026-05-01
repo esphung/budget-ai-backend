@@ -39,4 +39,21 @@ describe('RunMigrations', () => {
 			expect(result.name).toBe(table);
 		}
 	});
+
+	test('should enforce valid accounts account_type values', async () => {
+		const migrations = new runMigrations(db);
+		migrations.execute();
+
+		const schemaRow = await db.get(
+			"SELECT sql FROM sqlite_master WHERE type='table' AND name='accounts';"
+		);
+		expect(schemaRow).toBeDefined();
+		expect(schemaRow.sql).toContain('account_type TEXT NOT NULL CHECK');
+		expect(schemaRow.sql).toContain("'cash'");
+		expect(schemaRow.sql).toContain("'checking'");
+		expect(schemaRow.sql).toContain("'savings'");
+		expect(schemaRow.sql).toContain("'credit'");
+		expect(schemaRow.sql).toContain("'investment'");
+		expect(schemaRow.sql).toContain("'other'");
+	});
 });

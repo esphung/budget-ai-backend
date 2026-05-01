@@ -7,6 +7,7 @@ import { logUtils } from './services/logUtils';
 import { initDb } from './services/databaseService';
 import { Database } from 'sqlite3';
 import { createTransactionsRouter } from './routes/transactionsRouter';
+import { createAccountsRouter } from './routes/accountsRouter';
 
 async function startDb(): Promise<Database> {
 	try {
@@ -22,8 +23,9 @@ async function startDb(): Promise<Database> {
 function generateRouters(db: Database): Record<string, Router> {
 	// create routers with db dependency
 	const transactions = createTransactionsRouter(db);
+	const accounts = createAccountsRouter(db);
 
-	return { transactions };
+	return { transactions, accounts };
 }
 
 function startServer(routers: Record<string, Router>): express.Application {
@@ -51,6 +53,7 @@ function startServer(routers: Record<string, Router>): express.Application {
 	app.use('/plaid', plaidRouter);
 	app.use('/openai', openAiRouter);
 	app.use('/transactions', routers.transactions);
+	app.use('/accounts', routers.accounts);
 
 	app.listen(Number(PORT), () => {
 		logUtils.logger.info(

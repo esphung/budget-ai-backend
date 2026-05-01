@@ -1,0 +1,1 @@
+curl -X DELETE http://localhost:3001/transactions/txn_xgx1uayeo

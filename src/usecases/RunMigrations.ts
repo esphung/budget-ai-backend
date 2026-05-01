@@ -14,7 +14,16 @@ export class runMigrations {
     CREATE TABLE IF NOT EXISTS accounts (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
-      account_type TEXT NOT NULL,
+      account_type TEXT NOT NULL CHECK (
+        account_type IN (
+          'cash',
+          'checking',
+          'savings',
+          'credit',
+          'investment',
+          'other'
+        )
+      ),
       currency TEXT NOT NULL DEFAULT 'USD',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
