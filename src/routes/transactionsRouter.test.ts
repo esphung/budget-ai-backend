@@ -1,6 +1,6 @@
 import express from 'express';
 import request from 'supertest';
-import { createTransactionsRouter } from './TransactionsRouter';
+import { createTransactionsRouter } from './transactionsRouter';
 import { Database } from 'sqlite3';
 
 jest.mock('../controllers/TransactionsController');
