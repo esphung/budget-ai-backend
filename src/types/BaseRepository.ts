@@ -1,8 +1,8 @@
 export type BaseRepository<T> = {
-	getAll(): Promise<T[]>;
-	getById(id: string): Promise<T | null>;
+	getAll(ownerId?: string): Promise<T[]>;
+	getById(id: string, ownerId?: string): Promise<T | null>;
 	create(item: T): Promise<T>;
-	update(id: string, item: T): Promise<T>;
-	delete(id: string): Promise<void>;
-	clear(): Promise<void>;
+	update(id: string, item: T, ownerId?: string): Promise<T>;
+	delete(id: string, ownerId?: string): Promise<void>;
+	clear(ownerId?: string): Promise<void>;
 };

@@ -10,9 +10,11 @@ class CategoriesRouter extends BaseRouter {
 	}
 
 	private initializeRoutes(controller: CategoriesController) {
-		this.get('/', async (_req, res) => {
+		this.get('/', async (req, res) => {
 			try {
-				const categories = await controller.getAllCategories();
+				const categories = await controller.getAllCategories(
+					req.ownerId
+				);
 				res.status(200).json(categories);
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -26,7 +28,7 @@ class CategoriesRouter extends BaseRouter {
 
 		this.post('/', async (req, res) => {
 			try {
-				await controller.createCategory(req.body);
+				await controller.createCategory(req.body, req.ownerId);
 				res.status(201).json({
 					message: 'Category created successfully',
 				});
@@ -42,7 +44,11 @@ class CategoriesRouter extends BaseRouter {
 
 		this.put('/:id', async (req, res) => {
 			try {
-				await controller.updateCategory(req.params.id, req.body);
+				await controller.updateCategory(
+					req.params.id,
+					req.body,
+					req.ownerId
+				);
 				res.json({ message: 'Category updated successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -54,9 +60,9 @@ class CategoriesRouter extends BaseRouter {
 			}
 		});
 
-		this.delete('/all', async (_req, res) => {
+		this.delete('/all', async (req, res) => {
 			try {
-				await controller.clearCategories();
+				await controller.clearCategories(req.ownerId);
 				res.json({ message: 'All categories cleared successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -70,7 +76,7 @@ class CategoriesRouter extends BaseRouter {
 
 		this.delete('/:id', async (req, res) => {
 			try {
-				await controller.deleteCategory(req.params.id);
+				await controller.deleteCategory(req.params.id, req.ownerId);
 				res.json({ message: 'Category deleted successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);

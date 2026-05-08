@@ -10,9 +10,11 @@ class TransactionsRouter extends BaseRouter {
 	}
 
 	private initializeRoutes(controller: TransactionsController) {
-		this.get('/', async (_req, res) => {
+		this.get('/', async (req, res) => {
 			try {
-				const transactions = await controller.getAllTransactions();
+				const transactions = await controller.getAllTransactions(
+					req.ownerId
+				);
 				res.status(200).json(transactions);
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -29,7 +31,10 @@ class TransactionsRouter extends BaseRouter {
 		this.post('/', async (req, res) => {
 			const transactionData = req.body;
 			try {
-				await controller.createTransaction(transactionData);
+				await controller.createTransaction(
+					transactionData,
+					req.ownerId
+				);
 				res.status(201).json({
 					message: 'Transaction created successfully',
 				});
@@ -49,7 +54,8 @@ class TransactionsRouter extends BaseRouter {
 			try {
 				await controller.updateTransaction(
 					transactionId,
-					transactionData
+					transactionData,
+					req.ownerId
 				);
 				res.json({ message: 'Transaction updated successfully' });
 			} catch (error: any | Error) {
@@ -62,9 +68,9 @@ class TransactionsRouter extends BaseRouter {
 			}
 		});
 
-		this.delete('/all', async (_req, res) => {
+		this.delete('/all', async (req, res) => {
 			try {
-				await controller.clearTransactions();
+				await controller.clearTransactions(req.ownerId);
 				res.json({ message: 'All transactions cleared successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -79,7 +85,7 @@ class TransactionsRouter extends BaseRouter {
 		this.delete('/:id', async (req, res) => {
 			const transactionId = req.params.id;
 			try {
-				await controller.deleteTransaction(transactionId);
+				await controller.deleteTransaction(transactionId, req.ownerId);
 				res.json({ message: 'Transaction deleted successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);

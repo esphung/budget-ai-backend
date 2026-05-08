@@ -22,19 +22,19 @@ const mapRowToTransaction = (row: RowTransaction): Transaction => {
 export class TransactionsRepository implements BaseRepository<Transaction> {
 	constructor(private db: Database) {}
 
-	delete(id: string): Promise<void> {
+	delete(id: string, ownerId?: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.db.run(
-				'DELETE FROM transactions WHERE id = ?',
-				[id],
-				function (this: any, err) {
-					if (err) {
-						reject(err);
-					} else {
-						resolve();
-					}
+			const sql = ownerId
+				? 'DELETE FROM transactions WHERE id = ? AND owner_id = ?'
+				: 'DELETE FROM transactions WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.run(sql, params, function (this: any, err) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
 				}
-			);
+			});
 		});
 	}
 
@@ -51,40 +51,51 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 		});
 	}
 
-	getAll(): Promise<Transaction[]> {
-		let transactions: Transaction[] = [];
+	getAll(ownerId?: string): Promise<Transaction[]> {
 		return new Promise((resolve, reject) => {
+			if (ownerId) {
+				this.db.all(
+					'SELECT * FROM transactions WHERE owner_id = ?',
+					[ownerId],
+					(err, rows: RowTransaction[]) => {
+						if (err) {
+							reject(err);
+						} else {
+							resolve(rows.map(mapRowToTransaction));
+						}
+					}
+				);
+				return;
+			}
+
 			this.db.all(
 				'SELECT * FROM transactions',
 				(err, rows: RowTransaction[]) => {
 					if (err) {
 						reject(err);
 					} else {
-						transactions = rows.map(mapRowToTransaction);
-						resolve(transactions);
+						resolve(rows.map(mapRowToTransaction));
 					}
 				}
 			);
 		});
 	}
 
-	getById(id: string): Promise<Transaction | null> {
-		let transaction: Transaction | null = null;
+	getById(id: string, ownerId?: string): Promise<Transaction | null> {
 		return new Promise((resolve, reject) => {
-			this.db.get(
-				'SELECT * FROM transactions WHERE id = ?',
-				[id],
-				(err, row: RowTransaction) => {
-					if (err) {
-						reject(err);
-					} else if (row) {
-						transaction = mapRowToTransaction(row);
-						resolve(transaction);
-					} else {
-						resolve(null);
-					}
+			const sql = ownerId
+				? 'SELECT * FROM transactions WHERE id = ? AND owner_id = ?'
+				: 'SELECT * FROM transactions WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.get(sql, params, (err, row: RowTransaction) => {
+				if (err) {
+					reject(err);
+				} else if (row) {
+					resolve(mapRowToTransaction(row));
+				} else {
+					resolve(null);
 				}
-			);
+			});
 		});
 	}
 
@@ -129,14 +140,22 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 		});
 	}
 
-	update(id: string, item: Partial<Transaction>): Promise<Transaction> {
+	update(
+		id: string,
+		item: Partial<Transaction>,
+		ownerId?: string
+	): Promise<Transaction> {
 		return new Promise((resolve, reject) => {
 			// First, we need to fetch the existing transaction to ensure we have all fields for the update
 			const existingTransactionPromise = new Promise<RowTransaction>(
 				(res, rej) => {
+					const fetchSql = ownerId
+						? 'SELECT * FROM transactions WHERE id = ? AND owner_id = ?'
+						: 'SELECT * FROM transactions WHERE id = ?';
+					const fetchParams = ownerId ? [id, ownerId] : [id];
 					this.db.get(
-						'SELECT * FROM transactions WHERE id = ?',
-						[id],
+						fetchSql,
+						fetchParams,
 						(err, row: RowTransaction) => {
 							if (err) {
 								rej(err);
@@ -188,18 +207,29 @@ export class TransactionsRepository implements BaseRepository<Transaction> {
 		});
 	}
 
-	clear(): Promise<void> {
+	clear(ownerId?: string): Promise<void> {
 		console.log(
 			'[TransactionsRepository] clear() called: Deleting all transactions'
 		);
 		return new Promise((resolve, reject) => {
-			this.db.run('DELETE FROM transactions', function (this: any, err) {
+			const onComplete = function (this: any, err: Error | null) {
 				if (err) {
 					reject(err);
 				} else {
 					resolve();
 				}
-			});
+			};
+
+			if (ownerId) {
+				this.db.run(
+					'DELETE FROM transactions WHERE owner_id = ?',
+					[ownerId],
+					onComplete
+				);
+				return;
+			}
+
+			this.db.run('DELETE FROM transactions', onComplete);
 		});
 	}
 }

@@ -6,6 +6,15 @@ export const openApiSpec = {
 		description: 'Public API for BudgetAI backend services.',
 	},
 	servers: [{ url: 'http://localhost:3001', description: 'Local server' }],
+	components: {
+		securitySchemes: {
+			BearerAuth: {
+				type: 'http',
+				scheme: 'bearer',
+				bearerFormat: 'JWT',
+			},
+		},
+	},
 	paths: {
 		'/health': {
 			get: {
@@ -146,6 +155,7 @@ export const openApiSpec = {
 			get: {
 				tags: ['Transactions'],
 				summary: 'Get all transactions',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'List of transactions',
@@ -211,6 +221,7 @@ export const openApiSpec = {
 			post: {
 				tags: ['Transactions'],
 				summary: 'Create a new transaction',
+				security: [{ BearerAuth: [] }],
 				requestBody: {
 					required: true,
 					content: {
@@ -256,6 +267,7 @@ export const openApiSpec = {
 			put: {
 				tags: ['Transactions'],
 				summary: 'Update a transaction',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -308,6 +320,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Transactions'],
 				summary: 'Delete a transaction',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -334,6 +347,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Transactions'],
 				summary: 'Delete all transactions',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'All transactions cleared successfully',
@@ -347,10 +361,12 @@ export const openApiSpec = {
 				},
 			},
 		},
+
 		'/accounts': {
 			get: {
 				tags: ['Accounts'],
 				summary: 'Get all accounts',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'List of accounts',
@@ -399,6 +415,7 @@ export const openApiSpec = {
 			post: {
 				tags: ['Accounts'],
 				summary: 'Create a new account',
+				security: [{ BearerAuth: [] }],
 				requestBody: {
 					required: true,
 					content: {
@@ -448,6 +465,7 @@ export const openApiSpec = {
 			put: {
 				tags: ['Accounts'],
 				summary: 'Update an account',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -502,6 +520,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Accounts'],
 				summary: 'Delete an account',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -528,6 +547,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Accounts'],
 				summary: 'Delete all accounts',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'All accounts cleared successfully',
@@ -541,10 +561,12 @@ export const openApiSpec = {
 				},
 			},
 		},
+
 		'/categories': {
 			get: {
 				tags: ['Categories'],
 				summary: 'Get all categories',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'List of categories',
@@ -587,6 +609,7 @@ export const openApiSpec = {
 			post: {
 				tags: ['Categories'],
 				summary: 'Create a new category',
+				security: [{ BearerAuth: [] }],
 				requestBody: {
 					required: true,
 					content: {
@@ -621,6 +644,7 @@ export const openApiSpec = {
 			put: {
 				tags: ['Categories'],
 				summary: 'Update a category',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -665,6 +689,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Categories'],
 				summary: 'Delete a category',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -691,6 +716,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Categories'],
 				summary: 'Delete all categories',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'All categories cleared successfully',
@@ -704,10 +730,12 @@ export const openApiSpec = {
 				},
 			},
 		},
+
 		'/budgets': {
 			get: {
 				tags: ['Budgets'],
 				summary: 'Get all budgets',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'List of budgets',
@@ -756,6 +784,7 @@ export const openApiSpec = {
 			post: {
 				tags: ['Budgets'],
 				summary: 'Create a new budget',
+				security: [{ BearerAuth: [] }],
 				requestBody: {
 					required: true,
 					content: {
@@ -797,6 +826,7 @@ export const openApiSpec = {
 			put: {
 				tags: ['Budgets'],
 				summary: 'Update a budget',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -843,6 +873,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Budgets'],
 				summary: 'Delete a budget',
+				security: [{ BearerAuth: [] }],
 				parameters: [
 					{
 						name: 'id',
@@ -869,6 +900,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ['Budgets'],
 				summary: 'Delete all budgets',
+				security: [{ BearerAuth: [] }],
 				responses: {
 					'200': {
 						description: 'All budgets cleared successfully',

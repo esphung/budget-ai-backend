@@ -15,7 +15,11 @@ export class TransactionsController
 		this.repo = new TransactionsRepository(db);
 	}
 
-	getAllTransactions() {
+	getAllTransactions(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.getAll(ownerId);
+		}
+
 		return this.repo.getAll();
 	}
 
@@ -23,20 +27,37 @@ export class TransactionsController
 		data: Omit<Transaction, 'id' | 'createdAt'> & {
 			id?: string;
 			createdAt?: string;
-		}
+		},
+		ownerId?: string
 	) {
-		return this.repo.create(data);
+		return this.repo.create({ ...data, ownerId: ownerId ?? data.ownerId });
 	}
 
-	updateTransaction(id: string, data: Omit<Partial<Transaction>, 'id'>) {
+	updateTransaction(
+		id: string,
+		data: Omit<Partial<Transaction>, 'id'>,
+		ownerId?: string
+	) {
+		if (ownerId) {
+			return this.repo.update(id, data, ownerId);
+		}
+
 		return this.repo.update(id, data);
 	}
 
-	deleteTransaction(id: string) {
+	deleteTransaction(id: string, ownerId?: string) {
+		if (ownerId) {
+			return this.repo.delete(id, ownerId);
+		}
+
 		return this.repo.delete(id);
 	}
 
-	clearTransactions() {
+	clearTransactions(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.clear(ownerId);
+		}
+
 		return this.repo.clear();
 	}
 }
