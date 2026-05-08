@@ -18,9 +18,13 @@ const mapRowToAccount = (row: RowAccount): Account => {
 export class AccountsRepository implements BaseRepository<Account> {
 	constructor(private db: Database) {}
 
-	delete(id: string): Promise<void> {
+	delete(id: string, ownerId?: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.db.run('DELETE FROM accounts WHERE id = ?', [id], (err) => {
+			const sql = ownerId
+				? 'DELETE FROM accounts WHERE id = ? AND owner_id = ?'
+				: 'DELETE FROM accounts WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.run(sql, params, (err) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -30,9 +34,25 @@ export class AccountsRepository implements BaseRepository<Account> {
 		});
 	}
 
-	getAll(): Promise<Account[]> {
+	getAll(ownerId?: string): Promise<Account[]> {
 		let accounts: Account[] = [];
 		return new Promise((resolve, reject) => {
+			if (ownerId) {
+				this.db.all(
+					'SELECT * FROM accounts WHERE owner_id = ?',
+					[ownerId],
+					(err, rows: RowAccount[]) => {
+						if (err) {
+							reject(err);
+						} else {
+							accounts = rows.map(mapRowToAccount);
+							resolve(accounts);
+						}
+					}
+				);
+				return;
+			}
+
 			this.db.all('SELECT * FROM accounts', (err, rows: RowAccount[]) => {
 				if (err) {
 					reject(err);
@@ -44,23 +64,23 @@ export class AccountsRepository implements BaseRepository<Account> {
 		});
 	}
 
-	getById(id: string): Promise<Account | null> {
+	getById(id: string, ownerId?: string): Promise<Account | null> {
 		let account: Account | null = null;
 		return new Promise((resolve, reject) => {
-			this.db.get(
-				'SELECT * FROM accounts WHERE id = ?',
-				[id],
-				(err, row: RowAccount) => {
-					if (err) {
-						reject(err);
-					} else if (row) {
-						account = mapRowToAccount(row);
-						resolve(account);
-					} else {
-						resolve(null);
-					}
+			const sql = ownerId
+				? 'SELECT * FROM accounts WHERE id = ? AND owner_id = ?'
+				: 'SELECT * FROM accounts WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.get(sql, params, (err, row: RowAccount) => {
+				if (err) {
+					reject(err);
+				} else if (row) {
+					account = mapRowToAccount(row);
+					resolve(account);
+				} else {
+					resolve(null);
 				}
-			);
+			});
 		});
 	}
 
@@ -101,13 +121,21 @@ export class AccountsRepository implements BaseRepository<Account> {
 		});
 	}
 
-	update(id: string, item: Partial<Account>): Promise<Account> {
+	update(
+		id: string,
+		item: Partial<Account>,
+		ownerId?: string
+	): Promise<Account> {
 		return new Promise((resolve, reject) => {
+			const fetchSql = ownerId
+				? 'SELECT * FROM accounts WHERE id = ? AND owner_id = ?'
+				: 'SELECT * FROM accounts WHERE id = ?';
+			const fetchParams = ownerId ? [id, ownerId] : [id];
 			const existingAccountPromise = new Promise<RowAccount>(
 				(res, rej) => {
 					this.db.get(
-						'SELECT * FROM accounts WHERE id = ?',
-						[id],
+						fetchSql,
+						fetchParams,
 						(err, row: RowAccount) => {
 							if (err) {
 								rej(err);
@@ -154,15 +182,26 @@ export class AccountsRepository implements BaseRepository<Account> {
 		});
 	}
 
-	clear(): Promise<void> {
+	clear(ownerId?: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.db.run('DELETE FROM accounts', (err) => {
+			const onComplete = (err: Error | null) => {
 				if (err) {
 					reject(err);
 				} else {
 					resolve();
 				}
-			});
+			};
+
+			if (ownerId) {
+				this.db.run(
+					'DELETE FROM accounts WHERE owner_id = ?',
+					[ownerId],
+					onComplete
+				);
+				return;
+			}
+
+			this.db.run('DELETE FROM accounts', onComplete);
 		});
 	}
 }

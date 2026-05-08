@@ -15,7 +15,11 @@ export class CategoriesController
 		this.repo = new CategoriesRepository(db);
 	}
 
-	getAllCategories() {
+	getAllCategories(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.getAll(ownerId);
+		}
+
 		return this.repo.getAll();
 	}
 
@@ -24,20 +28,37 @@ export class CategoriesController
 			id?: string;
 			createdAt?: string;
 			updatedAt?: string;
-		}
+		},
+		ownerId?: string
 	) {
-		return this.repo.create(data);
+		return this.repo.create({ ...data, ownerId: ownerId ?? data.ownerId });
 	}
 
-	updateCategory(id: string, data: Omit<Partial<Category>, 'id'>) {
+	updateCategory(
+		id: string,
+		data: Omit<Partial<Category>, 'id'>,
+		ownerId?: string
+	) {
+		if (ownerId) {
+			return this.repo.update(id, data, ownerId);
+		}
+
 		return this.repo.update(id, data);
 	}
 
-	deleteCategory(id: string) {
+	deleteCategory(id: string, ownerId?: string) {
+		if (ownerId) {
+			return this.repo.delete(id, ownerId);
+		}
+
 		return this.repo.delete(id);
 	}
 
-	clearCategories() {
+	clearCategories(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.clear(ownerId);
+		}
+
 		return this.repo.clear();
 	}
 }

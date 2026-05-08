@@ -15,7 +15,11 @@ export class AccountsController
 		this.repo = new AccountsRepository(db);
 	}
 
-	getAllAccounts() {
+	getAllAccounts(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.getAll(ownerId);
+		}
+
 		return this.repo.getAll();
 	}
 
@@ -24,20 +28,37 @@ export class AccountsController
 			id?: string;
 			createdAt?: string;
 			updatedAt?: string;
-		}
+		},
+		ownerId?: string
 	) {
-		return this.repo.create(data);
+		return this.repo.create({ ...data, ownerId: ownerId ?? data.ownerId });
 	}
 
-	updateAccount(id: string, data: Omit<Partial<Account>, 'id'>) {
+	updateAccount(
+		id: string,
+		data: Omit<Partial<Account>, 'id'>,
+		ownerId?: string
+	) {
+		if (ownerId) {
+			return this.repo.update(id, data, ownerId);
+		}
+
 		return this.repo.update(id, data);
 	}
 
-	deleteAccount(id: string) {
+	deleteAccount(id: string, ownerId?: string) {
+		if (ownerId) {
+			return this.repo.delete(id, ownerId);
+		}
+
 		return this.repo.delete(id);
 	}
 
-	clearAccounts() {
+	clearAccounts(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.clear(ownerId);
+		}
+
 		return this.repo.clear();
 	}
 }

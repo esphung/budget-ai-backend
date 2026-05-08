@@ -15,7 +15,11 @@ export class BudgetsController
 		this.repo = new BudgetsRepository(db);
 	}
 
-	getAllBudgets() {
+	getAllBudgets(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.getAll(ownerId);
+		}
+
 		return this.repo.getAll();
 	}
 
@@ -24,20 +28,37 @@ export class BudgetsController
 			id?: string;
 			createdAt?: string;
 			updatedAt?: string;
-		}
+		},
+		ownerId?: string
 	) {
-		return this.repo.create(data);
+		return this.repo.create({ ...data, ownerId: ownerId ?? data.ownerId });
 	}
 
-	updateBudget(id: string, data: Omit<Partial<Budget>, 'id'>) {
+	updateBudget(
+		id: string,
+		data: Omit<Partial<Budget>, 'id'>,
+		ownerId?: string
+	) {
+		if (ownerId) {
+			return this.repo.update(id, data, ownerId);
+		}
+
 		return this.repo.update(id, data);
 	}
 
-	deleteBudget(id: string) {
+	deleteBudget(id: string, ownerId?: string) {
+		if (ownerId) {
+			return this.repo.delete(id, ownerId);
+		}
+
 		return this.repo.delete(id);
 	}
 
-	clearBudgets() {
+	clearBudgets(ownerId?: string) {
+		if (ownerId) {
+			return this.repo.clear(ownerId);
+		}
+
 		return this.repo.clear();
 	}
 }

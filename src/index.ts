@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { Request, Response, Router } from 'express';
 import { jsonErrorHandler } from './middleware/jsonErrorHandler';
+import { parseAuthHeader } from './middleware/parseAuthHeader';
 import { openAiRouter, plaidRouter, publicRouter } from './routes';
 import { env } from './services/env';
 import { logUtils } from './services/logUtils';
@@ -46,6 +47,7 @@ function startServer(routers: Record<string, Router>): express.Application {
 		})
 	);
 	app.use(express.json());
+	app.use(parseAuthHeader);
 	app.use(logUtils.morganMiddleware);
 	app.use(jsonErrorHandler);
 

@@ -18,9 +18,13 @@ const mapRowToCategory = (row: RowCategory): Category => {
 export class CategoriesRepository implements BaseRepository<Category> {
 	constructor(private db: Database) {}
 
-	delete(id: string): Promise<void> {
+	delete(id: string, ownerId?: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.db.run('DELETE FROM categories WHERE id = ?', [id], (err) => {
+			const sql = ownerId
+				? 'DELETE FROM categories WHERE id = ? AND owner_id = ?'
+				: 'DELETE FROM categories WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.run(sql, params, (err) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -30,8 +34,23 @@ export class CategoriesRepository implements BaseRepository<Category> {
 		});
 	}
 
-	getAll(): Promise<Category[]> {
+	getAll(ownerId?: string): Promise<Category[]> {
 		return new Promise((resolve, reject) => {
+			if (ownerId) {
+				this.db.all(
+					'SELECT * FROM categories WHERE owner_id = ?',
+					[ownerId],
+					(err, rows: RowCategory[]) => {
+						if (err) {
+							reject(err);
+						} else {
+							resolve(rows.map(mapRowToCategory));
+						}
+					}
+				);
+				return;
+			}
+
 			this.db.all(
 				'SELECT * FROM categories',
 				(err, rows: RowCategory[]) => {
@@ -45,21 +64,21 @@ export class CategoriesRepository implements BaseRepository<Category> {
 		});
 	}
 
-	getById(id: string): Promise<Category | null> {
+	getById(id: string, ownerId?: string): Promise<Category | null> {
 		return new Promise((resolve, reject) => {
-			this.db.get(
-				'SELECT * FROM categories WHERE id = ?',
-				[id],
-				(err, row: RowCategory) => {
-					if (err) {
-						reject(err);
-					} else if (row) {
-						resolve(mapRowToCategory(row));
-					} else {
-						resolve(null);
-					}
+			const sql = ownerId
+				? 'SELECT * FROM categories WHERE id = ? AND owner_id = ?'
+				: 'SELECT * FROM categories WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.get(sql, params, (err, row: RowCategory) => {
+				if (err) {
+					reject(err);
+				} else if (row) {
+					resolve(mapRowToCategory(row));
+				} else {
+					resolve(null);
 				}
-			);
+			});
 		});
 	}
 
@@ -100,51 +119,66 @@ export class CategoriesRepository implements BaseRepository<Category> {
 		});
 	}
 
-	update(id: string, item: Partial<Category>): Promise<Category> {
+	update(
+		id: string,
+		item: Partial<Category>,
+		ownerId?: string
+	): Promise<Category> {
 		return new Promise((resolve, reject) => {
-			this.db.get(
-				'SELECT * FROM categories WHERE id = ?',
-				[id],
-				(err, row: RowCategory) => {
-					if (err) return reject(err);
-					if (!row) return reject(new Error('Category not found'));
+			const fetchSql = ownerId
+				? 'SELECT * FROM categories WHERE id = ? AND owner_id = ?'
+				: 'SELECT * FROM categories WHERE id = ?';
+			const fetchParams = ownerId ? [id, ownerId] : [id];
+			this.db.get(fetchSql, fetchParams, (err, row: RowCategory) => {
+				if (err) return reject(err);
+				if (!row) return reject(new Error('Category not found'));
 
-					const existing = mapRowToCategory(row);
-					const merged: Category = { ...existing, ...item, id };
+				const existing = mapRowToCategory(row);
+				const merged: Category = { ...existing, ...item, id };
 
-					this.db.run(
-						'UPDATE categories SET name = ?, color = ?, icon = ?, owner_id = ?, created_at = ?, updated_at = ? WHERE id = ?',
-						[
-							merged.name,
-							merged.color,
-							merged.icon,
-							merged.ownerId,
-							merged.createdAt,
-							merged.updatedAt,
-							id,
-						],
-						(updateErr) => {
-							if (updateErr) {
-								reject(updateErr);
-							} else {
-								resolve(merged);
-							}
+				this.db.run(
+					'UPDATE categories SET name = ?, color = ?, icon = ?, owner_id = ?, created_at = ?, updated_at = ? WHERE id = ?',
+					[
+						merged.name,
+						merged.color,
+						merged.icon,
+						merged.ownerId,
+						merged.createdAt,
+						merged.updatedAt,
+						id,
+					],
+					(updateErr) => {
+						if (updateErr) {
+							reject(updateErr);
+						} else {
+							resolve(merged);
 						}
-					);
-				}
-			);
+					}
+				);
+			});
 		});
 	}
 
-	clear(): Promise<void> {
+	clear(ownerId?: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.db.run('DELETE FROM categories', (err) => {
+			const onComplete = (err: Error | null) => {
 				if (err) {
 					reject(err);
 				} else {
 					resolve();
 				}
-			});
+			};
+
+			if (ownerId) {
+				this.db.run(
+					'DELETE FROM categories WHERE owner_id = ?',
+					[ownerId],
+					onComplete
+				);
+				return;
+			}
+
+			this.db.run('DELETE FROM categories', onComplete);
 		});
 	}
 }

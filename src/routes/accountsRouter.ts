@@ -10,9 +10,9 @@ class AccountsRouter extends BaseRouter {
 	}
 
 	private initializeRoutes(controller: AccountsController) {
-		this.get('/', async (_req, res) => {
+		this.get('/', async (req, res) => {
 			try {
-				const accounts = await controller.getAllAccounts();
+				const accounts = await controller.getAllAccounts(req.ownerId);
 				res.status(200).json(accounts);
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -26,7 +26,7 @@ class AccountsRouter extends BaseRouter {
 		this.post('/', async (req, res) => {
 			const accountData = req.body;
 			try {
-				await controller.createAccount(accountData);
+				await controller.createAccount(accountData, req.ownerId);
 				res.status(201).json({
 					message: 'Account created successfully',
 				});
@@ -41,7 +41,11 @@ class AccountsRouter extends BaseRouter {
 			const accountId = req.params.id;
 			const accountData = req.body;
 			try {
-				await controller.updateAccount(accountId, accountData);
+				await controller.updateAccount(
+					accountId,
+					accountData,
+					req.ownerId
+				);
 				res.json({ message: 'Account updated successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -50,9 +54,9 @@ class AccountsRouter extends BaseRouter {
 			}
 		});
 
-		this.delete('/all', async (_req, res) => {
+		this.delete('/all', async (req, res) => {
 			try {
-				await controller.clearAccounts();
+				await controller.clearAccounts(req.ownerId);
 				res.json({ message: 'All accounts cleared successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -64,7 +68,7 @@ class AccountsRouter extends BaseRouter {
 		this.delete('/:id', async (req, res) => {
 			const accountId = req.params.id;
 			try {
-				await controller.deleteAccount(accountId);
+				await controller.deleteAccount(accountId, req.ownerId);
 				res.json({ message: 'Account deleted successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);

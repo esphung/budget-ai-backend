@@ -9,7 +9,7 @@
 		"dev": "npx nodemon --watch 'src/**/*.ts' --exec 'npx ts-node' src/index.ts",
 		"build": "npx tsc --project tsconfig.json",
 		"heroku-postbuild": "yarn build",
-		"start": "node dist/index.js",
+		"start": "yarn build && node dist/index.js",
 		"ts:start": "npx ts-node src/index.ts",
 		"test": "npx jest",
 		"test:coverage": "npx jest --coverage",

@@ -10,9 +10,9 @@ class BudgetsRouter extends BaseRouter {
 	}
 
 	private initializeRoutes(controller: BudgetsController) {
-		this.get('/', async (_req, res) => {
+		this.get('/', async (req, res) => {
 			try {
-				const budgets = await controller.getAllBudgets();
+				const budgets = await controller.getAllBudgets(req.ownerId);
 				res.status(200).json(budgets);
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -23,7 +23,7 @@ class BudgetsRouter extends BaseRouter {
 
 		this.post('/', async (req, res) => {
 			try {
-				await controller.createBudget(req.body);
+				await controller.createBudget(req.body, req.ownerId);
 				res.status(201).json({
 					message: 'Budget created successfully',
 				});
@@ -36,7 +36,11 @@ class BudgetsRouter extends BaseRouter {
 
 		this.put('/:id', async (req, res) => {
 			try {
-				await controller.updateBudget(req.params.id, req.body);
+				await controller.updateBudget(
+					req.params.id,
+					req.body,
+					req.ownerId
+				);
 				res.json({ message: 'Budget updated successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -45,9 +49,9 @@ class BudgetsRouter extends BaseRouter {
 			}
 		});
 
-		this.delete('/all', async (_req, res) => {
+		this.delete('/all', async (req, res) => {
 			try {
-				await controller.clearBudgets();
+				await controller.clearBudgets(req.ownerId);
 				res.json({ message: 'All budgets cleared successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);
@@ -58,7 +62,7 @@ class BudgetsRouter extends BaseRouter {
 
 		this.delete('/:id', async (req, res) => {
 			try {
-				await controller.deleteBudget(req.params.id);
+				await controller.deleteBudget(req.params.id, req.ownerId);
 				res.json({ message: 'Budget deleted successfully' });
 			} catch (error: any | Error) {
 				const msg = ErrorTools.extractErrorMessage(error);

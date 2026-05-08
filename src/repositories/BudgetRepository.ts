@@ -20,9 +20,13 @@ const mapRowToBudget = (row: RowBudget): Budget => {
 export class BudgetsRepository implements BaseRepository<Budget> {
 	constructor(private db: Database) {}
 
-	delete(id: string): Promise<void> {
+	delete(id: string, ownerId?: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.db.run('DELETE FROM budgets WHERE id = ?', [id], (err) => {
+			const sql = ownerId
+				? 'DELETE FROM budgets WHERE id = ? AND owner_id = ?'
+				: 'DELETE FROM budgets WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.run(sql, params, (err) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -32,8 +36,23 @@ export class BudgetsRepository implements BaseRepository<Budget> {
 		});
 	}
 
-	getAll(): Promise<Budget[]> {
+	getAll(ownerId?: string): Promise<Budget[]> {
 		return new Promise((resolve, reject) => {
+			if (ownerId) {
+				this.db.all(
+					'SELECT * FROM budgets WHERE owner_id = ?',
+					[ownerId],
+					(err, rows: RowBudget[]) => {
+						if (err) {
+							reject(err);
+						} else {
+							resolve(rows.map(mapRowToBudget));
+						}
+					}
+				);
+				return;
+			}
+
 			this.db.all('SELECT * FROM budgets', (err, rows: RowBudget[]) => {
 				if (err) {
 					reject(err);
@@ -44,21 +63,21 @@ export class BudgetsRepository implements BaseRepository<Budget> {
 		});
 	}
 
-	getById(id: string): Promise<Budget | null> {
+	getById(id: string, ownerId?: string): Promise<Budget | null> {
 		return new Promise((resolve, reject) => {
-			this.db.get(
-				'SELECT * FROM budgets WHERE id = ?',
-				[id],
-				(err, row: RowBudget) => {
-					if (err) {
-						reject(err);
-					} else if (row) {
-						resolve(mapRowToBudget(row));
-					} else {
-						resolve(null);
-					}
+			const sql = ownerId
+				? 'SELECT * FROM budgets WHERE id = ? AND owner_id = ?'
+				: 'SELECT * FROM budgets WHERE id = ?';
+			const params = ownerId ? [id, ownerId] : [id];
+			this.db.get(sql, params, (err, row: RowBudget) => {
+				if (err) {
+					reject(err);
+				} else if (row) {
+					resolve(mapRowToBudget(row));
+				} else {
+					resolve(null);
 				}
-			);
+			});
 		});
 	}
 
@@ -103,53 +122,68 @@ export class BudgetsRepository implements BaseRepository<Budget> {
 		});
 	}
 
-	update(id: string, item: Partial<Budget>): Promise<Budget> {
+	update(
+		id: string,
+		item: Partial<Budget>,
+		ownerId?: string
+	): Promise<Budget> {
 		return new Promise((resolve, reject) => {
-			this.db.get(
-				'SELECT * FROM budgets WHERE id = ?',
-				[id],
-				(err, row: RowBudget) => {
-					if (err) return reject(err);
-					if (!row) return reject(new Error('Budget not found'));
+			const fetchSql = ownerId
+				? 'SELECT * FROM budgets WHERE id = ? AND owner_id = ?'
+				: 'SELECT * FROM budgets WHERE id = ?';
+			const fetchParams = ownerId ? [id, ownerId] : [id];
+			this.db.get(fetchSql, fetchParams, (err, row: RowBudget) => {
+				if (err) return reject(err);
+				if (!row) return reject(new Error('Budget not found'));
 
-					const existing = mapRowToBudget(row);
-					const merged: Budget = { ...existing, ...item, id };
+				const existing = mapRowToBudget(row);
+				const merged: Budget = { ...existing, ...item, id };
 
-					this.db.run(
-						'UPDATE budgets SET name = ?, amount = ?, category_id = ?, period_start = ?, period_end = ?, owner_id = ?, created_at = ?, updated_at = ? WHERE id = ?',
-						[
-							merged.name,
-							merged.amount,
-							merged.categoryId,
-							merged.periodStart,
-							merged.periodEnd,
-							merged.ownerId,
-							merged.createdAt,
-							merged.updatedAt,
-							id,
-						],
-						(updateErr) => {
-							if (updateErr) {
-								reject(updateErr);
-							} else {
-								resolve(merged);
-							}
+				this.db.run(
+					'UPDATE budgets SET name = ?, amount = ?, category_id = ?, period_start = ?, period_end = ?, owner_id = ?, created_at = ?, updated_at = ? WHERE id = ?',
+					[
+						merged.name,
+						merged.amount,
+						merged.categoryId,
+						merged.periodStart,
+						merged.periodEnd,
+						merged.ownerId,
+						merged.createdAt,
+						merged.updatedAt,
+						id,
+					],
+					(updateErr) => {
+						if (updateErr) {
+							reject(updateErr);
+						} else {
+							resolve(merged);
 						}
-					);
-				}
-			);
+					}
+				);
+			});
 		});
 	}
 
-	clear(): Promise<void> {
+	clear(ownerId?: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.db.run('DELETE FROM budgets', (err) => {
+			const onComplete = (err: Error | null) => {
 				if (err) {
 					reject(err);
 				} else {
 					resolve();
 				}
-			});
+			};
+
+			if (ownerId) {
+				this.db.run(
+					'DELETE FROM budgets WHERE owner_id = ?',
+					[ownerId],
+					onComplete
+				);
+				return;
+			}
+
+			this.db.run('DELETE FROM budgets', onComplete);
 		});
 	}
 }
