@@ -11,9 +11,11 @@
 		"resolveJsonModule": true,
 		"forceConsistentCasingInFileNames": true,
 		"moduleResolution": "nodenext",
+		"typeRoots": ["./src/types", "./node_modules/@types"],
 		"types": ["jest", "node"],
 		"noImplicitAny": false
 	},
+	"files": ["src/types/express.d.ts"],
 	"include": ["src", "index.ts"],
 	"exclude": ["node_modules", "dist", "coverage"]
 }

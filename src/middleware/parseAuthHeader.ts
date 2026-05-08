@@ -13,7 +13,6 @@ export function parseAuthHeader(
 				Buffer.from(token.split('.')[1], 'base64url').toString('utf8')
 			);
 			req.ownerId = payload.sub;
-			console.debug(`OWNER ID: ${req.ownerId}`);
 		} catch {
 			// malformed token — ownerId stays undefined
 		}

@@ -57,12 +57,6 @@ describe('transactionsRouter', () => {
 		expect(res.body.message).toMatch(/cleared/i);
 	});
 
-	it('DELETE /transactions/clear clears all transactions', async () => {
-		const res = await request(app).delete('/transactions/clear');
-		expect(res.status).toBe(200);
-		expect(res.body.message).toMatch(/cleared/i);
-	});
-
 	it('DELETE /transactions/:id deletes a transaction', async () => {
 		const res = await request(app).delete('/transactions/4');
 		expect(res.status).toBe(200);
