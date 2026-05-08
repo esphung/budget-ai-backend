@@ -68,7 +68,7 @@ class TransactionsRouter extends BaseRouter {
 			}
 		});
 
-		this.delete('/all', async (req, res) => {
+		const clearAllTransactions = async (req: any, res: any) => {
 			try {
 				await controller.clearTransactions(req.ownerId);
 				res.json({ message: 'All transactions cleared successfully' });
@@ -80,7 +80,10 @@ class TransactionsRouter extends BaseRouter {
 				);
 				res.status(400).json({ error: msg });
 			}
-		});
+		};
+
+		this.delete('/all', clearAllTransactions);
+		this.delete('/clear', clearAllTransactions);
 
 		this.delete('/:id', async (req, res) => {
 			const transactionId = req.params.id;

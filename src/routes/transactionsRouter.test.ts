@@ -13,6 +13,7 @@ const mockMethods = {
 	getAllTransactions: jest.fn().mockResolvedValue([{ id: '1' }]),
 	createTransaction: jest.fn().mockResolvedValue({ id: '2' }),
 	updateTransaction: jest.fn().mockResolvedValue({ id: '3' }),
+	clearTransactions: jest.fn().mockResolvedValue(undefined),
 	deleteTransaction: jest.fn().mockResolvedValue(undefined),
 };
 
@@ -48,6 +49,18 @@ describe('transactionsRouter', () => {
 			.send({ amount: 200 });
 		expect(res.status).toBe(200);
 		expect(res.body.message).toMatch(/updated/i);
+	});
+
+	it('DELETE /transactions/all clears all transactions', async () => {
+		const res = await request(app).delete('/transactions/all');
+		expect(res.status).toBe(200);
+		expect(res.body.message).toMatch(/cleared/i);
+	});
+
+	it('DELETE /transactions/clear clears all transactions', async () => {
+		const res = await request(app).delete('/transactions/clear');
+		expect(res.status).toBe(200);
+		expect(res.body.message).toMatch(/cleared/i);
 	});
 
 	it('DELETE /transactions/:id deletes a transaction', async () => {
